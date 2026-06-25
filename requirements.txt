@@ -1,0 +1,2 @@
+# Runtime deps vary by deployment. Core pipeline uses stdlib + optional Supabase client.
+# pip install supabase  # only when STORE_BACKEND=supabase

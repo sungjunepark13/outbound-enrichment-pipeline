@@ -1,0 +1,11 @@
+company,contact_name,email,email_confidence,email_source,evidence_url,lead_with,channel
+Peachtree Precision Machining,Jordan Ellis,j.ellis@peachtreeprecision.example,verified,contact_page,https://peachtreeprecision.example/contact,adjectives_not_numbers,email
+Bayou Metal Works,Maria Chen,mchen@bayoumetal.example,verified,jsonld,https://bayoumetal.example/,review_lead_response,email
+Summit CNC LLC,,,invalid,,,rfq_no_cad_upload,call
+Lakeside Fabrication,Tom Reed,treed@lakesidefab.example,risky,pattern_inferred,https://lakesidefab.example/,adjectives_not_numbers,email
+Northline Tool & Die,Pat Okafor,pokafor@northlinetool.example,verified,site_mailto,https://northlinetool.example/about,no_site,call
+Heritage Machine Co.,Dana Wu,dwu@heritagemachine.example,verified,contact_page,https://heritagemachine.example/contact,adjectives_not_numbers,email
+Atlas Job Shop,,,unverified,,,margin_blind,call
+Riverbend Metals,Chris Holt,cholt@riverbendmetals.example,verified,rdap,https://riverbendmetals.example/,adjectives_not_numbers,email
+Cornerstone Machining,Leah Park,lpark@cornerstonemach.example,risky,contact_page,https://cornerstonemach.example/contact,review_lead_response,email
+Pioneer Precision,,,invalid,,,rfq_no_cad_upload,call

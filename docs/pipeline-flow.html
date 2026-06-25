@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lead Pipeline — Flow</title>
+  <style>
+    :root {
+      --bg: #0c1017;
+      --panel: #141b26;
+      --text: #e8eef4;
+      --muted: #8b9cb3;
+      --wire: #2d4563;
+      --wire-lit: #4d9fff;
+      --spark: #9ee7ff;
+      --node: #1a2433;
+      --border: #2d4563;
+      --hub: #1a2d45;
+      --built: #34d399;
+      --planned: #94a3b8;
+      --gate: #fbbf24;
+      --stop: #f87171;
+      --label: #9eb8d4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px 12px 40px;
+    }
+
+    header, footer { max-width: 980px; margin: 0 auto; }
+    h1 { font-size: 1.2rem; font-weight: 600; }
+    .sub { color: var(--muted); font-size: 0.85rem; margin-top: 5px; }
+
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 10px 14px;
+      margin-top: 12px; font-size: 0.72rem; color: var(--muted);
+    }
+    .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+    .lg { background: var(--built); }
+    .lp { border: 2px dashed var(--planned); background: transparent; }
+
+    .wrap {
+      max-width: 980px;
+      margin: 20px auto 0;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow-x: auto;
+    }
+
+    .chart {
+      position: relative;
+      width: 940px;
+      height: 1020px;
+      margin: 0 auto;
+      padding-bottom: 12px;
+    }
+
+    svg.lines {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .wire { fill: none; stroke: var(--wire); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .wire-lit { stroke: var(--wire-lit); stroke-width: 1.5; opacity: 0.3; filter: blur(1px); }
+    .wire-planned { stroke-dasharray: 6 8; opacity: 0.5; }
+
+    .nodes { position: relative; z-index: 2; width: 100%; height: 100%; }
+
+    .n {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      background: var(--node);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 7px 10px;
+      text-align: center;
+      width: 100px;
+    }
+
+    .n .t { font-size: 0.74rem; font-weight: 600; line-height: 1.2; }
+    .n .d { font-size: 0.6rem; color: var(--muted); margin-top: 2px; line-height: 1.25; }
+
+    .n.sm { width: 88px; padding: 6px 8px; }
+    .n.sm .t { font-size: 0.68rem; }
+
+    .n.hub {
+      background: var(--hub);
+      border-color: var(--wire-lit);
+      box-shadow: 0 0 0 1px rgba(77,159,255,0.2);
+      width: 128px;
+      padding: 9px 12px;
+    }
+    .n.hub .t { font-size: 0.82rem; }
+
+    .n.gate { border-color: var(--gate); width: 92px; }
+    .n.leaf { width: 94px; }
+    .n.stop { border-color: var(--stop); width: 80px; }
+    .n.planned { border-style: dashed; border-color: var(--planned); }
+
+    .tag {
+      display: block;
+      font-size: 0.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 3px;
+      color: var(--built);
+    }
+    .tag.soon { color: var(--planned); }
+
+    .more-note {
+      position: absolute;
+      left: 470px;
+      top: 518px;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      color: var(--muted);
+      z-index: 2;
+      white-space: nowrap;
+    }
+
+    .spark { fill: var(--spark); filter: drop-shadow(0 0 4px var(--wire-lit)); }
+
+    footer { margin-top: 12px; font-size: 0.68rem; color: var(--muted); text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Outreach flow — signal to action</h1>
+    <p class="sub">Research is linear. First touch is one fork. Each wire is labeled with the signal that triggers it.</p>
+    <div class="legend">
+      <span><i class="lg"></i>Live</span>
+      <span><i class="lp"></i>Coming soon</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="chart" id="chart">
+      <svg class="lines" id="svg"></svg>
+      <div class="nodes">
+        <!-- RESEARCH -->
+        <div class="n sm" id="n-search" style="left:90px;top:48px;"><div class="t">Local search</div></div>
+        <div class="n sm" id="n-fit" style="left:200px;top:48px;"><div class="t">Good fit?</div></div>
+        <div class="n sm" id="n-scan" style="left:310px;top:48px;"><div class="t">Site scan</div></div>
+        <div class="n sm" id="n-deep" style="left:420px;top:48px;"><div class="t">Deep look</div></div>
+        <div class="n sm" id="n-hook" style="left:530px;top:48px;"><div class="t">Hook locked</div></div>
+        <div class="n sm" id="n-email-find" style="left:640px;top:48px;"><div class="t">Find email</div></div>
+
+        <div class="n hub" id="n-ready" style="left:470px;top:118px;"><div class="t">Research complete</div></div>
+        <div class="n hub" id="n-first" style="left:470px;top:198px;"><div class="t">First touch</div><div class="d">single source</div></div>
+
+        <!-- FORKS -->
+        <div class="n leaf" id="n-b1" style="left:70px;top:368px;"><div class="t">Email</div><div class="d">challenger</div><span class="tag">Live</span></div>
+        <div class="n leaf" id="n-b2" style="left:230px;top:368px;"><div class="t">Call</div><div class="d">no email</div><span class="tag">Live</span></div>
+        <div class="n leaf" id="n-b3" style="left:390px;top:368px;"><div class="t">Call</div><div class="d">no website</div><span class="tag">Live</span></div>
+        <div class="n leaf planned" id="n-b4" style="left:550px;top:368px;"><div class="t">Call</div><div class="d">running ads</div><span class="tag soon">Soon</span></div>
+        <div class="n leaf" id="n-b5" style="left:710px;top:368px;"><div class="t">Email</div><div class="d">bad review</div><span class="tag">Live</span></div>
+
+        <div class="more-note">+ 4 more signals in doc</div>
+
+        <!-- MERGE -->
+        <div class="n" id="n-draft" style="left:350px;top:548px;"><div class="t">Draft</div></div>
+        <div class="n gate" id="n-approve" style="left:470px;top:548px;"><div class="t">You approve</div></div>
+        <div class="n" id="n-send" style="left:590px;top:548px;"><div class="t">Send</div></div>
+
+        <div class="n hub" id="n-wait" style="left:470px;top:638px;"><div class="t">Waiting</div></div>
+
+        <!-- OUTCOMES -->
+        <div class="n hub" id="n-reply-hub" style="left:200px;top:728px;"><div class="t">They reply</div></div>
+        <div class="n leaf" id="n-book" style="left:80px;top:848px;"><div class="t">Book</div><div class="d">wants times</div></div>
+        <div class="n leaf" id="n-no" style="left:200px;top:848px;"><div class="t">Stop chase</div><div class="d">not interested</div></div>
+        <div class="n stop" id="n-stop" style="left:320px;top:848px;"><div class="t">Stop</div><div class="d">unsubscribe</div></div>
+
+        <div class="n hub planned" id="n-quiet-hub" style="left:740px;top:728px;"><div class="t">They go quiet</div></div>
+        <div class="n leaf planned" id="n-fu" style="left:640px;top:848px;"><div class="t">Follow-up</div><div class="d">email</div></div>
+        <div class="n leaf planned" id="n-call" style="left:740px;top:848px;"><div class="t">Call</div><div class="d">not dialed</div></div>
+        <div class="n leaf planned" id="n-text" style="left:840px;top:848px;"><div class="t">Text</div><div class="d">breakup</div></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>conditional-logic-graph.md</footer>
+
+  <script>
+    const chart = document.getElementById("chart");
+    const svg = document.getElementById("svg");
+
+    const FORK_Y = 298;
+    const MERGE_Y = 488;
+
+    const forks = [
+      { from: "n-first", to: "n-b1", label: "proof + stat", planned: false },
+      { from: "n-first", to: "n-b2", label: "no email", planned: false },
+      { from: "n-first", to: "n-b3", label: "no website", planned: false },
+      { from: "n-first", to: "n-b4", label: "running ads", planned: true },
+      { from: "n-first", to: "n-b5", label: "bad review", planned: false },
+    ];
+
+    const edges = [
+      ["n-search", "n-fit"], ["n-fit", "n-scan"], ["n-scan", "n-deep"],
+      ["n-deep", "n-hook"], ["n-hook", "n-email-find"], ["n-email-find", "n-ready"],
+      ["n-ready", "n-first"],
+      ["n-draft", "n-approve"], ["n-approve", "n-send"], ["n-send", "n-wait"],
+      ["n-wait", "n-reply-hub", "they write back", false],
+      ["n-wait", "n-quiet-hub", "they go quiet", true],
+      ["n-reply-hub", "n-book", "says yes", false],
+      ["n-reply-hub", "n-no", "not interested", false],
+      ["n-reply-hub", "n-stop", "unsubscribe", false],
+      ["n-quiet-hub", "n-fu", "~3 days", true],
+      ["n-quiet-hub", "n-call", "no call yet", true],
+      ["n-quiet-hub", "n-text", "still quiet", true],
+    ];
+
+    function box(id) {
+      const el = document.getElementById(id);
+      const cr = chart.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      return {
+        x: r.left - cr.left + r.width / 2,
+        y: r.top - cr.top + r.height / 2,
+        top: r.top - cr.top,
+        bottom: r.bottom - cr.top,
+        left: r.left - cr.left,
+        right: r.right - cr.left,
+      };
+    }
+
+    function pathV(a, b) {
+      const mid = (a.y + b.y) / 2;
+      return `M ${a.x} ${a.y} L ${a.x} ${mid} L ${b.x} ${mid} L ${b.x} ${b.y}`;
+    }
+
+    function pathFan(from, to) {
+      return `M ${from.x} ${from.bottom} L ${from.x} ${FORK_Y} L ${to.x} ${FORK_Y} L ${to.x} ${to.top}`;
+    }
+
+    function pathFanOut(from, to) {
+      const OUT_Y = 718;
+      return `M ${from.x} ${from.bottom} L ${from.x} ${OUT_Y} L ${to.x} ${OUT_Y} L ${to.x} ${to.top}`;
+    }
+
+    function addWire(d, planned, glow) {
+      if (glow && !planned) {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        g.setAttribute("d", d);
+        g.setAttribute("class", "wire wire-lit");
+        svg.appendChild(g);
+      }
+      const w = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      w.setAttribute("d", d);
+      w.setAttribute("class", "wire" + (planned ? " wire-planned" : ""));
+      svg.appendChild(w);
+    }
+
+    function addLabel(x, y, text, planned, anchor) {
+      const pad = 3;
+      const fs = planned ? 8.5 : 9.5;
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.setAttribute("x", x);
+      t.setAttribute("y", y);
+      t.setAttribute("text-anchor", anchor || "middle");
+      t.setAttribute("font-size", fs);
+      t.setAttribute("fill", planned ? "#8b9cb3" : "#9eb8d4");
+      t.setAttribute("font-family", "system-ui, sans-serif");
+      t.textContent = text;
+      const bb = { width: text.length * fs * 0.55, height: fs + 4 };
+      const rx = anchor === "start" ? x - pad : anchor === "end" ? x - bb.width - pad : x - bb.width / 2 - pad;
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("x", rx);
+      rect.setAttribute("y", y - fs);
+      rect.setAttribute("width", bb.width + pad * 2);
+      rect.setAttribute("height", bb.height + pad);
+      rect.setAttribute("rx", 3);
+      rect.setAttribute("fill", "#141b26");
+      rect.setAttribute("opacity", "0.92");
+      svg.appendChild(rect);
+      svg.appendChild(t);
+    }
+
+    function build() {
+      const w = chart.clientWidth;
+      const h = chart.clientHeight;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      svg.innerHTML = "";
+
+      // spine
+      const spineIds = ["n-search","n-fit","n-scan","n-deep","n-hook","n-email-find"];
+      for (let i = 0; i < spineIds.length - 1; i++) {
+        addWire(pathV(box(spineIds[i]), box(spineIds[i + 1])), false, false);
+      }
+      addWire(pathV(box("n-email-find"), box("n-ready")), false, true);
+      addWire(pathV(box("n-ready"), box("n-first")), false, true);
+
+      // first-touch fan
+      const first = box("n-first");
+      forks.forEach(({ from, to, label, planned }) => {
+        const t = box(to);
+        const d = pathFan(first, t);
+        addWire(d, planned, !planned);
+        const lx = t.x;
+        const ly = FORK_Y - 8;
+        addLabel(lx, ly, label, planned);
+      });
+
+      // merge funnel
+      const branches = ["n-b1","n-b2","n-b3","n-b4","n-b5"];
+      const draft = box("n-draft");
+      branches.forEach((id) => {
+        const b = box(id);
+        addWire(`M ${b.x} ${b.bottom} L ${b.x} ${MERGE_Y} L ${draft.x} ${MERGE_Y}`, false, false);
+      });
+      addWire(`M ${draft.x} ${MERGE_Y} L ${draft.x} ${draft.top}`, false, true);
+
+      // pipeline + outcomes
+      edges.forEach(([from, to, label, planned]) => {
+        const a = box(from);
+        const b = box(to);
+        const sameRow = Math.abs(a.y - b.y) < 40;
+        let d;
+        if (from === "n-wait") {
+          d = pathFanOut(a, b);
+        } else if (from === "n-reply-hub" || from === "n-quiet-hub") {
+          d = pathFanOut(a, b);
+        } else {
+          d = sameRow ? `M ${a.x} ${a.y} L ${b.x} ${b.y}` : pathV(a, b);
+        }
+        addWire(d, planned, !planned && ["n-draft","n-approve","n-send"].includes(from));
+
+        if (label) {
+          let lx, ly, anchor = "middle";
+          if (from === "n-wait") {
+            lx = b.x;
+            ly = 718 - 8;
+          } else if (from === "n-reply-hub" || from === "n-quiet-hub") {
+            lx = b.x;
+            ly = 808 - 8;
+          } else {
+            lx = (a.x + b.x) / 2;
+            ly = (a.y + b.y) / 2 - 4;
+          }
+          addLabel(lx, ly, label, planned, anchor);
+        }
+      });
+
+      // pulse
+      const pulsePaths = [
+        pathV(box("n-ready"), box("n-first")),
+        pathFan(first, box("n-b1")),
+        `M ${draft.x} ${MERGE_Y} L ${draft.x} ${draft.top}`,
+        `M ${box("n-draft").x} ${box("n-draft").y} L ${box("n-approve").x} ${box("n-approve").y}`,
+        pathV(box("n-send"), box("n-wait")),
+      ];
+      pulsePaths.forEach((d, i) => {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("r", "2.5");
+        c.setAttribute("class", "spark");
+        const anim = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+        anim.setAttribute("dur", `${2.2 + i * 0.25}s`);
+        anim.setAttribute("repeatCount", "indefinite");
+        anim.setAttribute("begin", `${i * 0.35}s`);
+        anim.setAttribute("path", d);
+        g.appendChild(c);
+        g.appendChild(anim);
+        svg.appendChild(g);
+      });
+    }
+
+    build();
+    window.addEventListener("resize", () => {
+      clearTimeout(window._t);
+      window._t = setTimeout(build, 80);
+    });
+  </script>
+</body>
+</html>
