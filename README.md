@@ -36,13 +36,17 @@ Source → enrich (SMTP verify) → audit → propose_param_set → guardrail �
 
 ## Sample output
 
-See [samples/enriched-leads-redacted.csv](samples/enriched-leads-redacted.csv) (10 fictional companies) and [samples/draft-examples.md](samples/draft-examples.md).
+From a live **812-lead** store (pre-send, redacted): [samples/enriched-leads-redacted.csv](samples/enriched-leads-redacted.csv) · [samples/batch-stats.md](samples/batch-stats.md) · [samples/draft-examples.md](samples/draft-examples.md)
 
-| Lead | Email | Confidence | Source |
-|------|-------|------------|--------|
-| Peachtree Precision | j.ellis@…example | verified | contact_page |
-| Summit CNC | — | invalid | — |
-| Northline Tool | pokafor@…example | verified | site_mailto |
+| Metric | Value |
+|--------|-------|
+| Leads in store | 812 |
+| Audited | 775 |
+| Enrichment run (has-site) | 195 |
+| Candidates found | 195 (100%) |
+| Send-eligible today | 0% — SMTP verify not run on this batch |
+
+Company names and emails are fictionalized; `email_source`, `lead_with`, and `stage` come from the real pipeline. Re-export: `python3 scripts/export-redacted-sample.py` (see script docstring).
 
 ## Stack
 

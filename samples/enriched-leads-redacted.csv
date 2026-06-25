@@ -1,11 +1,11 @@
-company,contact_name,email,email_confidence,email_source,evidence_url,lead_with,channel
-Peachtree Precision Machining,Jordan Ellis,j.ellis@peachtreeprecision.example,verified,contact_page,https://peachtreeprecision.example/contact,adjectives_not_numbers,email
-Bayou Metal Works,Maria Chen,mchen@bayoumetal.example,verified,jsonld,https://bayoumetal.example/,review_lead_response,email
-Summit CNC LLC,,,invalid,,,rfq_no_cad_upload,call
-Lakeside Fabrication,Tom Reed,treed@lakesidefab.example,risky,pattern_inferred,https://lakesidefab.example/,adjectives_not_numbers,email
-Northline Tool & Die,Pat Okafor,pokafor@northlinetool.example,verified,site_mailto,https://northlinetool.example/about,no_site,call
-Heritage Machine Co.,Dana Wu,dwu@heritagemachine.example,verified,contact_page,https://heritagemachine.example/contact,adjectives_not_numbers,email
-Atlas Job Shop,,,unverified,,,margin_blind,call
-Riverbend Metals,Chris Holt,cholt@riverbendmetals.example,verified,rdap,https://riverbendmetals.example/,adjectives_not_numbers,email
-Cornerstone Machining,Leah Park,lpark@cornerstonemach.example,risky,contact_page,https://cornerstonemach.example/contact,review_lead_response,email
-Pioneer Precision,,,invalid,,,rfq_no_cad_upload,call
+company,contact_name,email,email_confidence,email_source,evidence_url,lead_with,channel,stage
+Peachtree Precision Machining,Jordan Ellis,,unverified,,https://shop19c4c7.example/,analytics_suspected_absent,call,audited
+Bayou Metal Works,Maria Chen,,unverified,,https://shop6abe06.example/,builder_site,call,audited
+Summit CNC LLC,,,unverified,,https://shopce526e.example/,footer_year_stale,call,audited
+Lakeside Fabrication,Tom Reed,b***e@shop9aef6b.example,unverified,contact_page,https://shop9aef6b.example/,adjectives_not_numbers,call,audited
+Northline Tool & Die,Pat Okafor,i***o@shop9ab51f.example,unverified,contact_page,https://shop9ab51f.example/,missing_defense_tokens,call,audited
+Heritage Machine Co.,Dana Wu,o***s@shopabcab5.example,unverified,contact_page,https://shopabcab5.example/,rfq_no_cad_upload,call,audited
+Atlas Job Shop,,i***o@shop4552a4.example,unverified,jsonld,https://shop4552a4.example/,adjectives_not_numbers,call,audited
+Riverbend Metals,Chris Holt,i***o@shop8c1679.example,unverified,jsonld,https://shop8c1679.example/,missing_defense_tokens,call,audited
+Cornerstone Machining,Leah Park,s***e@shop51c578.example,unverified,jsonld,https://shop51c578.example/,rfq_no_cad_upload,call,audited
+Pioneer Precision,,s***e@shopa5db32.example,unverified,pattern_inferred,https://shopa5db32.example/,adjectives_not_numbers,call,audited
